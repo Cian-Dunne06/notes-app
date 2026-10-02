@@ -8,3 +8,10 @@ data class Note(
     var category: String,
     var isArchived: Boolean
 )
+{
+    override fun toString(): String = """
+        |($id) $title
+        |Priority: $priority/5 | Category: $category | Archived: ${if (isArchived) " Yes " else " No "}
+        |Body: $body
+    """.trimMargin()
+}
