@@ -1,5 +1,6 @@
 import service.NoteService
 import model.Note
+import utils.readNextInt
 
 val noteService = NoteService()
 
@@ -20,8 +21,8 @@ fun mainMenu(): Int {
         >------------------------------
         >|  0) Exit                   |
         >------------------------------
-        > ==>> """.trimMargin(">"))
-    return readlnOrNull()?.toIntOrNull() ?: -1
+        > """.trimMargin(">"))
+    return readNextInt("==>> ")
 }
 
 fun runMenu() {
