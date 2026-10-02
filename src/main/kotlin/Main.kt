@@ -1,11 +1,16 @@
+import io.github.oshai.kotlinlogging.KotlinLogging
 import service.NoteService
 import model.Note
 import utils.readNextInt
 
+private val logger = KotlinLogging.logger {}
+
 val noteService = NoteService()
 
 fun main() {
+    logger.info { "Notes App Started" }
     runMenu()
+    logger.info { "Notes App Exiting" }
 }
 
 fun mainMenu(): Int {
