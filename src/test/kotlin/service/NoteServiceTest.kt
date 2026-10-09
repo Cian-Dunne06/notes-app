@@ -42,7 +42,7 @@ class NoteServiceTest {
 
 
     @Nested
-    inner class AddNotes {
+    inner class AddNote {
         @Test
         fun `add note to an empty service increases size correctly`() {
             assertEquals(0, emptyNoteService.getNotes().size)
@@ -91,7 +91,7 @@ class NoteServiceTest {
     }
 
     @Nested
-    inner class GetNotes {
+    inner class GetNote {
         @Test
         fun `getNotes returns an empty list when service is empty`() {
             assertTrue(emptyNoteService.getNotes().isEmpty())
@@ -106,7 +106,7 @@ class NoteServiceTest {
     }
 
     @Nested
-    inner class DeleteNotes {
+    inner class DeleteNote {
 
         @Test
         fun `deleting an existing note returns true` () {
@@ -137,11 +137,67 @@ class NoteServiceTest {
         }
 
         @Test
-        fun `deleting an exisiting note does not remove an other notes` () {
+        fun `deleting an existing note does not remove an other notes` () {
             populatedNoteService.deleteNote(3)
             assertTrue(populatedNoteService.getNotes().any { it.id == 0 })
             assertTrue(populatedNoteService.getNotes().any { it.id == 1 })
             assertTrue(populatedNoteService.getNotes().any { it.id == 2 })
+        }
+    }
+
+    @Nested
+    inner class UpdateNote {
+
+        @Test
+        fun `updating an existing note returns true` () {
+            val updated = Note(1, "Updated Title", "Updated Body", 5, "Work", true)
+            assertTrue(populatedNoteService.updateNote(1, updated))
+        }
+
+        @Test
+        fun `updating a non-existing note returns false` () {
+            val updated = Note(100, "Updated Title", "Updated Body", 5, "Social", true)
+            assertFalse(populatedNoteService.updateNote(100, updated))
+        }
+
+        @Test
+        fun `updating from an empty service returns false` () {
+            val updated = Note(1, "Updated Title", "Updated Body", 5, "Work", true)
+            assertFalse(emptyNoteService.updateNote(1, updated))
+        }
+
+        @Test
+        fun `updating an existing note changes its stored values` () {
+            val updated = Note(1, "Updated Title", "Updated Body", 5, "Social", true)
+
+            populatedNoteService.updateNote(1, updated)
+
+            val retrieved = populatedNoteService.getNotes()[1]
+
+            assertEquals("Updated Title", retrieved.title)
+            assertEquals("Updated Body", retrieved.body)
+            assertEquals(5, retrieved.priority)
+            assertEquals("Social", retrieved.category)
+            assertTrue(retrieved.isArchived)
+        }
+
+        @Test
+        fun `updating a note does not change the number of notes` () {
+            val originalSize = populatedNoteService.getNotes().size
+
+            val updated = Note(1, "Updated Title", "Updated Body", 5, "Social", true)
+            populatedNoteService.updateNote(1, updated)
+
+            assertEquals(originalSize, populatedNoteService.getNotes().size)
+        }
+
+        @Test
+        fun `updating an existing note preserves its id` () {
+            val updated = Note(33, "Updated Title", "Updated Body", 5, "Home", false)
+
+            populatedNoteService.updateNote(1, updated)
+
+            assertEquals(1, populatedNoteService.getNotes()[1].id)
         }
     }
 }
