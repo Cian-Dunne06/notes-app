@@ -74,11 +74,11 @@ class NoteServiceTest {
             emptyNoteService.addNote(note1)
             emptyNoteService.addNote(note2)
 
-            val retrievedNote1 = emptyNoteService.getNotes()[0]
-            val retrievedNote2 = emptyNoteService.getNotes()[1]
+            val retrievedNote1 = emptyNoteService.findNoteById(0)
+            val retrievedNote2 = emptyNoteService.findNoteById(1)
 
-            assertEquals(false, retrievedNote1.isArchived)
-            assertEquals(false, retrievedNote2.isArchived)
+            assertEquals(false, retrievedNote1?.isArchived)
+            assertEquals(false, retrievedNote2?.isArchived)
         }
 
         @Test
@@ -172,13 +172,12 @@ class NoteServiceTest {
 
             populatedNoteService.updateNote(1, updated)
 
-            val retrieved = populatedNoteService.getNotes()[1]
-
-            assertEquals("Updated Title", retrieved.title)
-            assertEquals("Updated Body", retrieved.body)
-            assertEquals(5, retrieved.priority)
-            assertEquals("Social", retrieved.category)
-            assertTrue(retrieved.isArchived)
+            val retrieved = populatedNoteService.findNoteById(1)
+            assertEquals("Updated Title", retrieved?.title)
+            assertEquals("Updated Body", retrieved?.body)
+            assertEquals(5, retrieved?.priority)
+            assertEquals("Social", retrieved?.category)
+            assertTrue(retrieved?.isArchived == true)
         }
 
         @Test
