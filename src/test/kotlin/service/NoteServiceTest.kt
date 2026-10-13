@@ -199,4 +199,18 @@ class NoteServiceTest {
             assertEquals(1, populatedNoteService.getNotes()[1].id)
         }
     }
+
+    @Nested
+    inner class countNotes {
+
+        @Test
+        fun `count notes returns zero when list is empty` () {
+            assertEquals(0, emptyNoteService.numberOfActiveNotes())
+        }
+
+        @Test
+        fun `count notes returns correct value for populated list` () {
+            assertEquals(4, populatedNoteService.numberOfNotes())
+        }
+    }
 }
