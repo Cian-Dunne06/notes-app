@@ -42,6 +42,30 @@ class NoteService {
         return result
     }
 
+    fun getArchivedNotes(): List<Note> {
+        val result = ArrayList<Note>()
+
+        for (note in notes) {
+            if (note.isArchived) {
+                result.add(note)
+            }
+        }
+
+        return result
+    }
+
+    fun getNotesByPriority(priority: Int): List<Note> {
+        val result = ArrayList<Note>()
+
+        for (note in notes) {
+            if (note.priority == priority) {
+                result.add(note)
+            }
+        }
+
+        return result
+    }
+
 
 
     fun deleteNote(id: Int) : Boolean {
@@ -115,6 +139,16 @@ class NoteService {
         for (note in notes) {
             if (note.id == id && !note.isArchived) {
                 note.isArchived = true
+                return true
+            }
+        }
+        return false
+    }
+
+    fun activateNote(id: Int): Boolean {
+        for (note in notes) {
+            if (note.id == id && note.isArchived) {
+                note.isArchived = false
                 return true
             }
         }
