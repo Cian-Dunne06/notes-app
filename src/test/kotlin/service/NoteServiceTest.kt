@@ -204,13 +204,67 @@ class NoteServiceTest {
     inner class countNotes {
 
         @Test
-        fun `count notes returns zero when list is empty` () {
+        fun `numberOfNotes returns correct value for populated list` () {
+            assertEquals(4, populatedNoteService.numberOfNotes())
+        }
+
+        @Test
+        fun `numberOfNotes returns zero for empty service`() {
+            assertEquals(0, emptyNoteService.numberOfNotes())
+        }
+
+        @Test
+        fun `numberOfArchivedNotes returns correct count after archiving notes`() {
+            assertTrue(populatedNoteService.archiveNote(2))
+            assertTrue(populatedNoteService.archiveNote(3))
+            assertEquals(2, populatedNoteService.numberOfArchivedNotes())
+        }
+
+        @Test
+        fun `numberOfArchivedNotes returns zero when no notes are archived`() {
+            emptyNoteService.addNote(note1)
+            emptyNoteService.addNote(note2)
+            emptyNoteService.addNote(note3)
+
+            assertEquals(0, emptyNoteService.numberOfArchivedNotes())
+        }
+
+        @Test
+        fun `numberOfActiveNotes returns correct count when all notes are still active`() {
+            assertEquals(4, populatedNoteService.numberOfActiveNotes())
+        }
+
+        @Test
+        fun `numberOfActiveNotes returns zero when all notes are archived`() {
+            emptyNoteService.addNote(note1)
+            emptyNoteService.addNote(note2)
+            emptyNoteService.addNote(note3)
+
+            emptyNoteService.archiveNote(note1.id)
+            emptyNoteService.archiveNote(note2.id)
+            emptyNoteService.archiveNote(note3.id)
+
             assertEquals(0, emptyNoteService.numberOfActiveNotes())
         }
 
         @Test
-        fun `count notes returns correct value for populated list` () {
-            assertEquals(4, populatedNoteService.numberOfNotes())
+        fun `numberOfNotesByCategory returns correct count for Work`() {
+            assertEquals(1, populatedNoteService.numberOfNotesByCategory("Work"))
+        }
+
+        @Test
+        fun `numberOfNotesByCategory returns zero when category does not exist`() {
+            assertEquals(0, populatedNoteService.numberOfNotesByCategory("Travel"))
+        }
+
+        @Test
+        fun `numberOfNotesByPriority returns correct count`() {
+            assertEquals(1, populatedNoteService.numberOfNotesByPriority(2))
+        }
+
+        @Test
+        fun `numberOfNotesByPriority returns zero when priority does not exist`() {
+            assertEquals(0, populatedNoteService.numberOfNotesByPriority(99))
         }
     }
 }
