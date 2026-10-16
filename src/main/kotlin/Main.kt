@@ -1,6 +1,7 @@
 import io.github.oshai.kotlinlogging.KotlinLogging
 import service.NoteService
 import model.Note
+import persistence.JSONSerializer
 import persistence.XMLSerializer
 import utils.readNextBoolean
 import utils.readNextInt
@@ -9,7 +10,8 @@ import java.io.File
 
 private val logger = KotlinLogging.logger {}
 
-val noteService = NoteService(XMLSerializer(File("notes.xml")))
+//val noteService = NoteService(XMLSerializer(File("notes.xml")))
+val noteService = NoteService(JSONSerializer(File("notes.json")))
 
 fun main() {
     logger.info { "Notes App Started" }
