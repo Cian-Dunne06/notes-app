@@ -103,6 +103,199 @@ class NoteServiceTest {
             assertEquals(4, notes.size)
         }
 
+        @Test
+        fun `getActiveNotes returns only non archived notes`(){
+            populatedNoteService.archiveNote(note1.id)
+            populatedNoteService.archiveNote(note3.id)
+
+            val activeList = populatedNoteService.getActiveNotes()
+
+            assertEquals(2, activeList.size)
+            assertTrue(activeList.all {!it.isArchived})
+        }
+
+        @Test
+        fun `getActiveNotes returns an empty list when no notes are stored` (){
+            val activeList = emptyNoteService.getActiveNotes()
+            assertTrue(activeList.isEmpty())
+        }
+
+        @Test
+        fun `getActiveNotes returns empty list when all notes are archived`(){
+            populatedNoteService.archiveNote(note1.id)
+            populatedNoteService.archiveNote(note2.id)
+            populatedNoteService.archiveNote(note3.id)
+            populatedNoteService.archiveNote(note4.id)
+
+            val activeList = populatedNoteService.getActiveNotes()
+
+            assertTrue(activeList.isEmpty())
+        }
+
+        @Test
+        fun `getActiveNotes returns all notes when none are archived` () {
+            val activeList = populatedNoteService.getActiveNotes()
+
+            assertEquals(4, activeList.size)
+            assertTrue(activeList.none {it.isArchived})
+        }
+
+        @Test
+        fun `getActiveNotes preserves correct count and content` (){
+            populatedNoteService.archiveNote(note2.id)
+
+            val activeList = populatedNoteService.getActiveNotes()
+
+            assertEquals(3, activeList.size)
+            assertTrue(activeList.all {!it.isArchived})
+
+            assertTrue(activeList.contains(note1))
+            assertTrue(activeList.contains(note3))
+            assertTrue(activeList.contains(note4))
+        }
+
+        @Test
+        fun `getNotesByCategory handles empty list`() {
+            val result = emptyNoteService.getNotesByCategory("Work")
+            assertTrue(result.isEmpty())
+        }
+
+        @Test
+        fun `getNotesByCategory returns all matching notes when all match`() {
+            emptyNoteService.addNote(Note(0, "A", "Body A", 1, "Work", false))
+            emptyNoteService.addNote(Note(0, "B", "Body B", 2, "Work", false))
+            emptyNoteService.addNote(Note(0, "C", "Body C", 3, "Work", false))
+
+            assertEquals(3, emptyNoteService.numberOfNotes())
+            val result = emptyNoteService.getNotesByCategory("Work")
+
+            assertEquals(3, result.size)
+            assertTrue(result.all { it.category == "Work" })
+        }
+
+        @Test
+        fun `getNotesByCategory returns no notes when the category is not in the list` () {
+            val result = populatedNoteService.getNotesByCategory("Invalid Category")
+            assertTrue(result.isEmpty())
+        }
+
+        @Test
+        fun `getNotesByCategory returns matching categories regardless of case` () {
+            val result = populatedNoteService.getNotesByCategory("home")
+            assertEquals(1, result.size)
+            assertTrue(result.all { it.category == "Home" })
+        }
+
+        @Test
+        fun `getNotesByCategory excludes notes whose categories do not match` () {
+            assertEquals(4, populatedNoteService.numberOfNotes())
+
+            val result = populatedNoteService.getNotesByCategory("Work")
+            assertEquals(1, result.size)
+
+            assertTrue(result.contains(note1))
+            assertFalse(result.contains(note2))
+            assertFalse(result.contains(note3))
+            assertFalse(result.contains(note4))
+        }
+
+        @Test
+        fun `getArchivedNotes returns only non active notes`(){
+            populatedNoteService.archiveNote(note1.id)
+            populatedNoteService.archiveNote(note3.id)
+
+            val archivedList = populatedNoteService.getArchivedNotes()
+
+            assertEquals(2, archivedList.size)
+            assertTrue(archivedList.all {it.isArchived})
+        }
+
+        @Test
+        fun `getArchivedNotes returns an empty list when no notes are stored` (){
+            val archivedList = emptyNoteService.getArchivedNotes()
+            assertTrue(archivedList.isEmpty())
+        }
+
+        @Test
+        fun `getArchivedNotes returns empty list when all notes are active`(){
+            populatedNoteService.activateNote(note1.id)
+            populatedNoteService.activateNote(note2.id)
+            populatedNoteService.activateNote(note3.id)
+            populatedNoteService.activateNote(note4.id)
+
+            val archivedList = populatedNoteService.getArchivedNotes()
+
+            assertTrue(archivedList.isEmpty())
+        }
+
+        @Test
+        fun `getArchivedNotes returns all notes when none are active` () {
+            populatedNoteService.archiveNote(note1.id)
+            populatedNoteService.archiveNote(note2.id)
+            populatedNoteService.archiveNote(note3.id)
+            populatedNoteService.archiveNote(note4.id)
+            val archivedList = populatedNoteService.getArchivedNotes()
+
+            assertEquals(4, archivedList.size)
+            assertTrue(archivedList.all {it.isArchived})
+        }
+
+        @Test
+        fun `getArchivedNotes preserves correct count and content` (){
+            populatedNoteService.archiveNote(note1.id)
+            populatedNoteService.archiveNote(note2.id)
+            populatedNoteService.archiveNote(note3.id)
+            populatedNoteService.activateNote(note4.id)
+
+
+            val archivedList = populatedNoteService.getArchivedNotes()
+
+            assertEquals(3, archivedList.size)
+            assertTrue(archivedList.all {it.isArchived})
+
+            assertTrue(archivedList.contains(note1))
+            assertTrue(archivedList.contains(note2))
+            assertTrue(archivedList.contains(note3))
+        }
+
+        @Test
+        fun `getNotesByPriority handles empty list`() {
+            val result = emptyNoteService.getNotesByPriority(1)
+            assertTrue(result.isEmpty())
+        }
+
+        @Test
+        fun `getNotesByPriority returns all matching notes when all match`() {
+            emptyNoteService.addNote(Note(0, "A", "Body A", 1, "Work", false))
+            emptyNoteService.addNote(Note(0, "B", "Body B", 1, "Work", false))
+            emptyNoteService.addNote(Note(0, "C", "Body C", 1, "Work", false))
+
+            assertEquals(3, emptyNoteService.numberOfNotes())
+            val result = emptyNoteService.getNotesByPriority(1)
+
+            assertEquals(3, result.size)
+            assertTrue(result.all { it.priority == 1 })
+        }
+
+        @Test
+        fun `getNotesByPriority returns no notes when the priority is not in the list` () {
+            val result = populatedNoteService.getNotesByPriority(6)
+            assertTrue(result.isEmpty())
+        }
+
+        @Test
+        fun `getNotesByPriority excludes notes whose categories do not match` () {
+            assertEquals(4, populatedNoteService.numberOfNotes())
+
+            val result = populatedNoteService.getNotesByPriority(1)
+            assertEquals(1, result.size)
+
+            assertTrue(result.contains(note1))
+            assertFalse(result.contains(note2))
+            assertFalse(result.contains(note3))
+            assertFalse(result.contains(note4))
+        }
+
     }
 
     @Nested
@@ -266,5 +459,6 @@ class NoteServiceTest {
         fun `numberOfNotesByPriority returns zero when priority does not exist`() {
             assertEquals(0, populatedNoteService.numberOfNotesByPriority(99))
         }
+
     }
 }
