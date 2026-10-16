@@ -1,0 +1,26 @@
+<ArrayList>
+  <item>
+    <id>0</id>
+    <title>Test1</title>
+    <body>Body1</body>
+    <priority>1</priority>
+    <category>Work</category>
+    <isArchived>false</isArchived>
+  </item>
+  <item>
+    <id>1</id>
+    <title>Test2</title>
+    <body>Body2</body>
+    <priority>2</priority>
+    <category>Home</category>
+    <isArchived>false</isArchived>
+  </item>
+  <item>
+    <id>2</id>
+    <title>Test3</title>
+    <body>Body3</body>
+    <priority>3</priority>
+    <category>College</category>
+    <isArchived>false</isArchived>
+  </item>
+</ArrayList>
