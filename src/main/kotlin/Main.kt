@@ -10,11 +10,13 @@ import java.io.File
 
 private val logger = KotlinLogging.logger {}
 
+val notesFile = File("notes.json")
 //val noteService = NoteService(XMLSerializer(File("notes.xml")))
-val noteService = NoteService(JSONSerializer(File("notes.json")))
+val noteService = NoteService(JSONSerializer(notesFile))
 
 fun main() {
     logger.info { "Notes App Started" }
+    if (notesFile.exists()) load()
     runMenu()
     logger.info { "Notes App Exiting" }
 }
@@ -30,6 +32,7 @@ fun mainMenu(): Int {
         >|  3) Update a Note          |
         >|  4) Delete a Note          |
         >|  5) Archive a Note         |
+        >|  6) Activate a Note        |
         >| 20) Save Notes             |
         >| 21) Load Notes             |
         >------------------------------
@@ -49,9 +52,10 @@ fun runMenu() {
             3 -> updateNote()
             4 -> deleteNote()
             5 -> archiveNote()
+            6 -> activateNote()
             20 -> save()
             21 -> load()
-            0 -> println("Exiting App")
+            0 -> { save(); println("Exiting App") }
             else -> println("Invalid Option")
         }
     } while (input != 0)
@@ -66,10 +70,8 @@ fun addNote(){
 
     val category = readNextLine("Category: ")
 
-    val isArchived = readNextBoolean("Is archived (y/n): ")
-
     noteService.addNote(
-        Note(0, title, body, priority, category, isArchived)
+        Note(0, title, body, priority, category, false)
     )
 
     println("Note added")
@@ -81,7 +83,7 @@ fun listNotes() {
         println("No notes stored")
     } else {
         listNotes.forEach { println(it) }
-        noteService.numberOfNotes()
+       println("There are ${noteService.numberOfNotes()} notes")
     }
 }
 
@@ -91,8 +93,7 @@ fun listActiveNotes() {
         println("No active notes")
     } else {
         activeNotes.forEach { println(it) }
-        println("There are ${activeNotes.size} active notes")
-        noteService.numberOfActiveNotes()
+        println("There are ${noteService.numberOfActiveNotes()} active notes")
     }
 }
 
@@ -102,7 +103,7 @@ fun listArchivedNotes() {
         println("No archived notes")
     } else {
         archivedNotes.forEach { println(it) }
-        noteService.numberOfArchivedNotes()
+        println("There are ${noteService.numberOfArchivedNotes()} archived notes")
     }
 }
 
@@ -138,7 +139,7 @@ fun listNoteMenu (): Int {
         >|  3) List Active Notes      |
         >|  4) List Notes by Category |
         >|  5) List Notes by Priority |
-        >>-----------------------------
+        >------------------------------
         >|  0) Go Back                |
         >------------------------------
     """.trimMargin(">"))
@@ -216,6 +217,18 @@ fun archiveNote() {
 
     if (noteService.archiveNote(id)) {
         println("Archived")
+    } else {
+        println("Not found")
+    }
+}
+
+fun activateNote() {
+    noteService.getNotes().forEach {if (it.isArchived) println(it)}
+
+    val id = readNextInt("ID to be activated: ")
+
+    if (noteService.activateNote(id)) {
+        println("Activated")
     } else {
         println("Not found")
     }
