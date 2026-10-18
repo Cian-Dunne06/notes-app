@@ -26,7 +26,7 @@ fun mainMenu(): Int {
         >------------------------------
         >| NOTE MENU                  |
         >|  1) Add a Note             |
-        >|  2) List all Notes         |
+        >|  2) List Notes             |
         >|  3) Update a Note          |
         >|  4) Delete a Note          |
         >|  5) Archive a Note         |
@@ -45,7 +45,7 @@ fun runMenu() {
         input = mainMenu()
         when (input) {
             1 -> addNote()
-            2 -> listNotes()
+            2 -> runListMenu()
             3 -> updateNote()
             4 -> deleteNote()
             5 -> archiveNote()
@@ -75,8 +75,90 @@ fun addNote(){
     println("Note added")
 }
 
-fun listNotes(){
-    noteService.getNotes().forEach {println(it)}
+fun listNotes() {
+    val listNotes = noteService.getNotes()
+    if (listNotes.isEmpty()) {
+        println("No notes stored")
+    } else {
+        listNotes.forEach { println(it) }
+        noteService.numberOfNotes()
+    }
+}
+
+fun listActiveNotes() {
+    val activeNotes = noteService.getActiveNotes()
+    if (activeNotes.isEmpty()) {
+        println("No active notes")
+    } else {
+        activeNotes.forEach { println(it) }
+        println("There are ${activeNotes.size} active notes")
+        noteService.numberOfActiveNotes()
+    }
+}
+
+fun listArchivedNotes() {
+    val archivedNotes = noteService.getArchivedNotes()
+    if (archivedNotes.isEmpty()) {
+        println("No archived notes")
+    } else {
+        archivedNotes.forEach { println(it) }
+        noteService.numberOfArchivedNotes()
+    }
+}
+
+fun listNotesByCategory() {
+    val category = readNextLine("Enter category: ")
+    val notesByCategory = noteService.getNotesByCategory(category)
+
+    if (notesByCategory.isEmpty()) {
+        println("No notes found in category")
+    } else {
+        notesByCategory.forEach { println(it) }
+    }
+}
+
+fun listNotesByPriority() {
+    val priority = readNextInt("Priority: ")
+    val notesByPriority = noteService.getNotesByPriority(priority)
+    if (notesByPriority.isEmpty()) {
+        println("No notes with priority $priority")
+    } else {
+        notesByPriority.forEach { println(it) }
+    }
+}
+
+fun listNoteMenu (): Int {
+    print("""
+        >------------------------------
+        >|      List Notes            |  
+        >------------------------------
+        >|  LIST NOTE MENU            |
+        >|  1) List All Notes         |
+        >|  2) List Archived Notes    |
+        >|  3) List Active Notes      |
+        >|  4) List Notes by Category |
+        >|  5) List Notes by Priority |
+        >>-----------------------------
+        >|  0) Go Back                |
+        >------------------------------
+    """.trimMargin(">"))
+    return readNextInt("==>> ")
+}
+
+fun runListMenu() {
+    var input: Int
+    do {
+        input = listNoteMenu()
+        when (input) {
+            1 -> listNotes()
+            2 -> listArchivedNotes()
+            3 -> listActiveNotes()
+            4 -> listNotesByCategory()
+            5 -> listNotesByPriority()
+            0 -> println("Returning to Main Menu...") // Option 0 breaks the loop and returns naturally
+            else -> println("Invalid Option")
+        }
+    } while (input != 0)
 }
 
 fun deleteNote() {
