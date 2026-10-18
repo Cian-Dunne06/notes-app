@@ -161,6 +161,7 @@ class NoteService(serializeType: Serializer) {
     fun load() {
         val array = serializer.read(Array<Note>::class.java)
         notes = array.toCollection(ArrayList())
+        lastId = (notes.maxOfOrNull { it.id } ?: -1) + 1
     }
 
     //@Throws(Exception::class)

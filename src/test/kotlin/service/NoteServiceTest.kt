@@ -40,6 +40,8 @@ class NoteServiceTest {
 
     @AfterEach
     fun tearDown() {
+        File("test-notes.xml").delete()
+        File("test-notes.json").delete()
         println("Test Completed")
     }
 
@@ -471,11 +473,11 @@ class NoteServiceTest {
         @Test
         fun `saving and loading an empty collection in XML doesn't crash app`() {
             // Saving an empty notes.XML file.
-            val storingNotes = NoteService(XMLSerializer(File("notes.xml")))
+            val storingNotes = NoteService(XMLSerializer(File("test-notes.xml")))
             storingNotes.store()
 
             //Loading the empty notes.xml file into a new object
-            val loadedNotes = NoteService(XMLSerializer(File("notes.xml")))
+            val loadedNotes = NoteService(XMLSerializer(File("test-notes.xml")))
             loadedNotes.load()
 
             //Comparing the source of the notes (storingNotes) with the XML loaded notes (loadedNotes)
@@ -487,14 +489,14 @@ class NoteServiceTest {
         @Test
         fun `saving notes to XML and then loading them doesn't loose data`() {
             // Storing 3 notes to the notes.XML file.
-            val storingNotes = NoteService(XMLSerializer(File("notes.xml")))
+            val storingNotes = NoteService(XMLSerializer(File("test-notes.xml")))
             storingNotes.addNote(note1)
             storingNotes.addNote(note2)
             storingNotes.addNote(note3)
             storingNotes.store()
 
             //Loading notes.xml into a different collection
-            val loadedNotes = NoteService(XMLSerializer(File("notes.xml")))
+            val loadedNotes = NoteService(XMLSerializer(File("test-notes.xml")))
             loadedNotes.load()
 
             //Comparing the source of the notes (storingNotes) with the XML loaded notes (loadedNotes)
@@ -509,11 +511,11 @@ class NoteServiceTest {
         @Test
         fun `saving and loading an empty collection in JSON doesn't crash app`() {
             // Saving an empty notes.JSON file.
-            val storingNotes = NoteService(JSONSerializer(File("notes.json")))
+            val storingNotes = NoteService(JSONSerializer(File("test-notes.json")))
             storingNotes.store()
 
             //Loading the empty notes.json file into a new object
-            val loadedNotes = NoteService(JSONSerializer(File("notes.json")))
+            val loadedNotes = NoteService(JSONSerializer(File("test-notes.json")))
             loadedNotes.load()
 
             //Comparing the source of the notes (storingNotes) with the XML loaded notes (loadedNotes)
@@ -525,14 +527,14 @@ class NoteServiceTest {
         @Test
         fun `saving notes to JSON and then loading them doesn't loose data`() {
             // Storing 3 notes to the notes.json file.
-            val storingNotes = NoteService(JSONSerializer(File("notes.json")))
+            val storingNotes = NoteService(JSONSerializer(File("test-notes.json")))
             storingNotes.addNote(note1)
             storingNotes.addNote(note2)
             storingNotes.addNote(note3)
             storingNotes.store()
 
             //Loading notes.json into a different collection
-            val loadedNotes = NoteService(JSONSerializer(File("notes.json")))
+            val loadedNotes = NoteService(JSONSerializer(File("test-notes.json")))
             loadedNotes.load()
 
             //Comparing the source of the notes (storingNotes) with the JSON loaded notes (loadedNotes)
@@ -542,6 +544,20 @@ class NoteServiceTest {
             assertEquals(storingNotes.findNoteById(0), loadedNotes.findNoteById(0))
             assertEquals(storingNotes.findNoteById(1), loadedNotes.findNoteById(1))
             assertEquals(storingNotes.findNoteById(2), loadedNotes.findNoteById(2))
+        }
+
+        @Test
+        fun `adding a note after loading gives it a unique id`() {
+            val storingNotes = NoteService(XMLSerializer(File("test-notes.xml")))
+            storingNotes.addNote(note1)
+            storingNotes.addNote(note2)
+            storingNotes.store()
+
+            val loadedNotes = NoteService(XMLSerializer(File("test-notes.xml")))
+            loadedNotes.load()
+            loadedNotes.addNote(note3)
+
+            assertEquals(2, note3.id)
         }
     }
 
