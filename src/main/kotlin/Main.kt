@@ -29,6 +29,7 @@ fun mainMenu(): Int {
         >|  2) List all Notes         |
         >|  3) Update a Note          |
         >|  4) Delete a Note          |
+        >|  5) Archive a Note         |
         >| 20) Save Notes             |
         >| 21) Load Notes             |
         >------------------------------
@@ -47,6 +48,7 @@ fun runMenu() {
             2 -> listNotes()
             3 -> updateNote()
             4 -> deleteNote()
+            5 -> archiveNote()
             20 -> save()
             21 -> load()
             0 -> println("Exiting App")
@@ -122,5 +124,17 @@ fun load() {
         noteService.load()
     } catch (e: Exception) {
         System.err.println("Error reading from file: $e")
+    }
+}
+
+fun archiveNote() {
+    noteService.getNotes().forEach {if (!it.isArchived) println(it)}
+
+    val id = readNextInt("ID to be archived: ")
+
+    if (noteService.archiveNote(id)) {
+        println("Archived")
+    } else {
+        println("Not found")
     }
 }
