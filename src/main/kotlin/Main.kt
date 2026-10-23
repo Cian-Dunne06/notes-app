@@ -196,22 +196,6 @@ fun updateNote() {
     }
 }
 
-fun save() {
-    try {
-        noteService.store()
-    } catch (e: Exception) {
-        System.err.println("Error writing to file: $e")
-    }
-}
-
-fun load() {
-    try {
-        noteService.load()
-    } catch (e: Exception) {
-        System.err.println("Error reading from file: $e")
-    }
-}
-
 fun archiveNote() {
     noteService.getNotes().forEach {if (!it.isArchived) println(it)}
 
@@ -245,3 +229,20 @@ fun searchByContent() {
         results.forEach { println(it) }
     }
 }
+
+fun save() {
+    try {
+        noteService.store()
+    } catch (e: Exception) {
+        System.err.println("Error writing to file: $e")
+    }
+}
+
+fun load() {
+    try {
+        noteService.load()
+    } catch (e: Exception) {
+        System.err.println("Error reading from file: $e")
+    }
+}
+
