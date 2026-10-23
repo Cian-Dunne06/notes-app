@@ -124,5 +124,9 @@ class NoteService(serializeType: Serializer) {
         serializer.write(notes)
     }
 
+    fun searchNotesByContent(content: String): List<Note> {
+        return notes.filter { it.body.contains(content, ignoreCase = true) || it.title.contains(content, ignoreCase = true) }
+    }
+
 
 }

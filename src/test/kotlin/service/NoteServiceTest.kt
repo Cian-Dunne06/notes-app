@@ -399,7 +399,7 @@ class NoteServiceTest {
     }
 
     @Nested
-    inner class countNotes {
+    inner class CountNotes {
 
         @Test
         fun `numberOfNotes returns correct value for populated list` () {
@@ -480,7 +480,7 @@ class NoteServiceTest {
             val loadedNotes = NoteService(XMLSerializer(File("test-notes.xml")))
             loadedNotes.load()
 
-            //Comparing the source of the notes (storingNotes) with the XML loaded notes (loadedNotes)
+            //Comparing the source of the notes (storingNotes) with the XML-loaded notes (loadedNotes)
             assertEquals(0, storingNotes.numberOfNotes())
             assertEquals(0, loadedNotes.numberOfNotes())
             assertEquals(storingNotes.numberOfNotes(), loadedNotes.numberOfNotes())
@@ -499,7 +499,7 @@ class NoteServiceTest {
             val loadedNotes = NoteService(XMLSerializer(File("test-notes.xml")))
             loadedNotes.load()
 
-            //Comparing the source of the notes (storingNotes) with the XML loaded notes (loadedNotes)
+            //Comparing the source of the notes (storingNotes) with the XML-loaded notes (loadedNotes)
             assertEquals(3, storingNotes.numberOfNotes())
             assertEquals(3, loadedNotes.numberOfNotes())
             assertEquals(storingNotes.numberOfNotes(), loadedNotes.numberOfNotes())
@@ -518,7 +518,7 @@ class NoteServiceTest {
             val loadedNotes = NoteService(JSONSerializer(File("test-notes.json")))
             loadedNotes.load()
 
-            //Comparing the source of the notes (storingNotes) with the XML loaded notes (loadedNotes)
+            //Comparing the source of the notes (storingNotes) with the XML-loaded notes (loadedNotes)
             assertEquals(0, storingNotes.numberOfNotes())
             assertEquals(0, loadedNotes.numberOfNotes())
             assertEquals(storingNotes.numberOfNotes(), loadedNotes.numberOfNotes())
@@ -655,6 +655,45 @@ class NoteServiceTest {
         @Test
         fun `numberOfNotesByPriority returns zero when priority does not exist`() {
             assertEquals(0, populatedNoteService.numberOfNotesByPriority(99))
+        }
+    }
+
+    @Nested
+    inner class SearchNotes {
+        @Test
+        fun `searchNotesByContent returns empty list when no notes match content`() {
+            val result = populatedNoteService.searchNotesByContent("non-existent content")
+            assertTrue(result.isEmpty())
+        }
+
+        @Test
+        fun `searchNotesByContent returns matching notes when content is present`() {
+            val result = populatedNoteService.searchNotesByContent("body1")
+            assertEquals(1, result.size)
+        }
+
+        @Test
+        fun `searchNotesByContent returns matching notes when content is present in multiple notes`() {
+            val result = populatedNoteService.searchNotesByContent("body")
+            assertEquals(4, result.size)
+        }
+
+        @Test
+        fun `searchNotesByContent is case-insensitive`() {
+            val result = populatedNoteService.searchNotesByContent("BODY")
+            assertEquals(4, result.size)
+        }
+
+        @Test
+        fun `searchNotesByContent returns matching notes when content is present in title only`() {
+            val result = populatedNoteService.searchNotesByContent("test1")
+            assertEquals(1, result.size)
+        }
+
+        @Test
+        fun `searchNotesByContent returns matching notes when content is only partial` () {
+            val result = populatedNoteService.searchNotesByContent("tes")
+            assertEquals(4, result.size)
         }
     }
 
