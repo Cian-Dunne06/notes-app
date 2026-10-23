@@ -561,4 +561,103 @@ class NoteServiceTest {
         }
     }
 
+    @Nested
+    inner class ArchiveNotes {
+        @Test
+        fun `archiving a note that does not exist returns false`(){
+            assertFalse(populatedNoteService.archiveNote(6))
+            assertFalse(populatedNoteService.archiveNote(-1))
+            assertFalse(emptyNoteService.archiveNote(0))
+        }
+
+        @Test
+        fun `archiving an already archived note returns false`(){
+            populatedNoteService.findNoteById(2)!!.isArchived = true
+            assertTrue(populatedNoteService.findNoteById(2)!!.isArchived)
+            assertFalse(populatedNoteService.archiveNote(2))
+        }
+
+        @Test
+        fun `archiving an active note that exists returns true and archives`() {
+            assertFalse(populatedNoteService.findNoteById(1)!!.isArchived)
+            assertTrue(populatedNoteService.archiveNote(1))
+            assertTrue(populatedNoteService.findNoteById(1)!!.isArchived)
+        }
+    }
+
+    @Nested
+    inner class CountingNotes{
+
+        @Test
+        fun `numberOfNotes returns correct total count for populated service`() {
+            assertEquals(4, populatedNoteService.numberOfNotes())
+        }
+
+        @Test
+        fun `numberOfNotes returns zero for empty service`() {
+            assertEquals(0, emptyNoteService.numberOfNotes())
+        }
+
+        @Test
+        fun `numberOfArchivedNotes returns correct count after archiving notes`() {
+            assertTrue(populatedNoteService.archiveNote(2))
+            assertTrue(populatedNoteService.archiveNote(3))
+            assertEquals(2, populatedNoteService.numberOfArchivedNotes())
+        }
+
+        @Test
+        fun `numberOfArchivedNotes returns zero when no notes are archived`() {
+            // new notes are always set to active
+            emptyNoteService.addNote(note1)
+            emptyNoteService.addNote(note2)
+            emptyNoteService.addNote(note3)
+
+            assertEquals(0, emptyNoteService.numberOfArchivedNotes())
+        }
+
+        @Test
+        fun `numberOfActiveNotes returns correct count when all notes are still active`() {
+            // new notes are always added as active, regardless.
+            assertEquals(4, populatedNoteService.numberOfActiveNotes())
+        }
+
+        @Test
+        fun `numberOfActiveNotes returns zero when all notes are archived`() {
+            // new notes are always set to active
+            emptyNoteService.addNote(note1)
+            emptyNoteService.addNote(note2)
+            emptyNoteService.addNote(note3)
+
+            // archive all notes
+            emptyNoteService.archiveNote(note1.id)
+            emptyNoteService.archiveNote(note2.id)
+            emptyNoteService.archiveNote(note3.id)
+
+            assertEquals(0, emptyNoteService.numberOfActiveNotes())
+        }
+
+        @Test
+        fun `numberOfNotesByCategory returns correct count for Work`() {
+            assertEquals(1, populatedNoteService.numberOfNotesByCategory("Work"))
+        }
+
+        @Test
+        fun `numberOfNotesByCategory returns zero when category does not exist`() {
+            assertEquals(0, populatedNoteService.numberOfNotesByCategory("Travel"))
+        }
+
+        @Test
+        fun `numberOfNotesByPriority returns correct count`() {
+            // Priority = 2 (note2 only)
+            assertEquals(1, populatedNoteService.numberOfNotesByPriority(2))
+        }
+
+        @Test
+        fun `numberOfNotesByPriority returns zero when priority does not exist`() {
+            assertEquals(0, populatedNoteService.numberOfNotesByPriority(99))
+        }
+    }
+
+
+
 }
