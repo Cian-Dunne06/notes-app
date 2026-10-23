@@ -6,13 +6,15 @@ data class Note(
     var body: String = "",
     var priority: Int = 0,
     var category: String = "",
-    var isArchived: Boolean = false
+    var isArchived: Boolean = false,
+    var status: String = ""
 )
 
 {
     override fun toString(): String = """
-        |($id) $title
+        |($id) $title 
         |Priority: $priority/5 | Category: $category | Archived: ${if (isArchived) " Yes " else " No "}
         |Body: $body
+        |Status: $status
     """.trimMargin()
 }
