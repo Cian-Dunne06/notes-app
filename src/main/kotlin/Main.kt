@@ -2,10 +2,15 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import service.NoteService
 import model.Note
 import persistence.JSONSerializer
-import persistence.XMLSerializer
+import utils.categories
+import utils.isValidCategory
+import utils.isValidStatus
+//import persistence.XMLSerializer
 import utils.readNextBoolean
 import utils.readNextInt
 import utils.readNextLine
+import utils.statusList
+import utils.validRange
 import java.io.File
 
 private val logger = KotlinLogging.logger {}
@@ -68,12 +73,32 @@ fun addNote(){
 
     val body = readNextLine("Body: ")
 
-    val priority = readNextInt("Priority (1-5): ")
+    var priority: Int
+    do {
+        priority = readNextInt("Priority (1-5): ")
+        if (!validRange(priority, 1, 5)) {
+            println("Invalid priority, please try again.")
+        }
+    } while (!validRange(priority, 1, 5))
 
-    val category = readNextLine("Category: ")
+    var category: String
+    do {
+        category = readNextLine("${categories.joinToString(", ")}| Pick a category: ")
+        if (!isValidCategory(category)) {
+            println("Invalid category, please try again. Valid Categories: ${categories.joinToString(", ")}")
+        }
+    } while (!isValidCategory(category))
+
+    var status: String
+    do {
+        status = readNextLine("${statusList.joinToString(", ")}|Pick a status: ")
+        if (!isValidStatus(status)) {
+            println("Invalid status, please try again. Valid Status: ${statusList.joinToString(", ")}")
+        }
+    } while (!isValidStatus(status))
 
     noteService.addNote(
-        Note(0, title, body, priority, category, false)
+        Note(0, title, body, priority, category, false, status)
     )
 
     println("Note added")
@@ -183,9 +208,11 @@ fun updateNote() {
 
     val priority = readNextInt("Priority (1-5): ")
 
-    val category = readNextLine("Category: ")
+    val category = readNextLine("${categories.joinToString(", ")}| Pick a category: ")
 
     val isArchived = readNextBoolean("Is archived (y/n): ")
+
+    val status = readNextLine("${statusList.joinToString(", ")}|Pick a status: ")
 
     val updated = Note(id, title, body, priority, category, isArchived)
 
