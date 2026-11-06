@@ -1,7 +1,10 @@
 import io.github.oshai.kotlinlogging.KotlinLogging
 import service.NoteService
 import model.Note
+import model.Item
 import persistence.JSONSerializer
+import service.ItemService
+import service.NoteItemService
 import utils.categories
 import utils.isValidCategory
 import utils.isValidStatus
@@ -19,9 +22,16 @@ val notesFile = File("notes.json")
 //val noteService = NoteService(XMLSerializer(File("notes.xml")))
 val noteService = NoteService(JSONSerializer(notesFile))
 
+val itemsFile = File("items.json")
+val itemService = ItemService(JSONSerializer(itemsFile))
+
+val noteItemFile = File("itemNotes.json")
+val noteItemService = NoteItemService(JSONSerializer(noteItemFile))
+
+
 fun main() {
     logger.info { "Notes App Started" }
-    if (notesFile.exists()) load()
+    load()
     runMenu()
     logger.info { "Notes App Exiting" }
 }
@@ -39,8 +49,11 @@ fun mainMenu(): Int {
         >|  5) Archive a Note         |
         >|  6) Activate a Note        |
         >|  7) Search Notes by Content|
+        >|  8) Add Item to Note       |
+        >|  9) View Items for Note    |
         >| 20) Save Notes             |
         >| 21) Load Notes             |
+        >  30) Item Menu              |
         >------------------------------
         >|  0) Exit                   |
         >------------------------------
@@ -60,8 +73,11 @@ fun runMenu() {
             5 -> archiveNote()
             6 -> activateNote()
             7 -> searchByContent()
+            8 -> addItemToNote()
+            9 -> viewItemsForNote()
             20 -> save()
             21 -> load()
+            30 -> runItemMenu()
             0 -> { save(); println("Exiting App") }
             else -> println("Invalid Option")
         }
@@ -214,7 +230,7 @@ fun updateNote() {
 
     val status = readNextLine("${statusList.joinToString(", ")}|Pick a status: ")
 
-    val updated = Note(id, title, body, priority, category, isArchived)
+    val updated = Note(id, title, body, priority, category, isArchived, status)
 
     if (noteService.updateNote(id, updated)) {
         println("Updated")
@@ -257,9 +273,130 @@ fun searchByContent() {
     }
 }
 
+//--------------------------ITEMS---------------------------------------------------------------------
+
+fun listItemMenu(): Int {
+    print("""
+        >------------------------------
+        >|         Item Menu          |  
+        >------------------------------
+        >| ITEM MENU                  |
+        >|  1) Add an Item            |
+        >|  2) List Items             |
+        >|  3) Search Items           |
+        >|  4) Item Report            |
+        >------------------------------
+        >|  0) Back                   |
+        >------------------------------
+        > """.trimMargin(">"))
+    return readNextInt("==>> ")
+}
+
+fun runItemMenu() {
+    var input : Int
+    do {
+        input = listItemMenu()
+        when (input) {
+            1 -> addItem()
+            2 -> listItems()
+            3 -> searchItemByContent()
+            4 -> itemReport()
+            0 -> println("Returning to main menu")
+            else -> println("Invalid Option")
+        }
+    } while (input != 0)
+}
+fun searchItemByContent() {
+    val content = readNextLine("Enter content to search: ")
+    val results = itemService.searchItemsByContent(content)
+    if (results.isEmpty()) {
+        println("No items found")
+    } else {
+        results.forEach { println(it) }
+    }
+}
+
+fun addItem() {
+    val id = readNextInt("ID: ")
+
+    val description = readNextLine("Description: ")
+
+    val complete = readNextBoolean("Complete(True/False): ")
+
+    itemService.addItem(
+        Item(id, description, complete)
+    )
+
+    println("Item added")
+}
+
+fun listItems(){
+    val listItems = itemService.getItem()
+    if (listItems.isEmpty()) {
+        println("No items stored")
+    } else {
+        listItems.forEach { println(it) }
+        println("There are ${itemService.numberOfItems()} items")
+    }
+}
+
+fun itemReport() {
+    print("""
+        >------------------------------
+        >       Item Report 
+        >------------------------------
+        >  Total Items: ${itemService.numberOfItems()}            
+        >  Complete Items: ${itemService.numberOfCompleteItems()}           
+        >  Incomplete Items: ${itemService.numberOfIncompleteItems()}           
+        >------------------------------
+        > """.trimMargin(">"))
+}
+
+
+fun addItemToNote() {
+    listNotes()
+    val noteId = readNextInt("Enter Note ID: ")
+    if (noteService.findNoteById(noteId) == null) {
+        println("Note not found")
+        return
+    }
+    listItems()
+    val itemId = readNextInt("Enter Item ID: ")
+    if (itemService.findItemById(itemId) == null) {
+        println("Item not found")
+        return
+    }
+    if (noteItemService.addItemToNote(noteId, itemId)) println("Item added to note")
+    else println("That item is already on this note")
+}
+
+fun viewItemsForNote() {
+    listNotes()
+    val noteId = readNextInt("Enter Note ID: ")
+    val note = noteService.findNoteById(noteId)
+    if (note == null) {
+        println("Note not found")
+        return
+    }
+
+    val itemIds = noteItemService.getItemIdsForNote(noteId)
+    if (itemIds.isEmpty()) {
+        println("No items for note")
+        return
+    }
+
+    println("Items for note: ${note.title}")
+    itemIds.forEach { itemId ->
+        val item = itemService.findItemById(itemId)
+        if (item != null) println(item)
+        }
+}
+//--------------------------------------------------------------------
 fun save() {
     try {
         noteService.store()
+        itemService.store()
+        noteItemService.store()
     } catch (e: Exception) {
         System.err.println("Error writing to file: $e")
     }
@@ -267,7 +404,9 @@ fun save() {
 
 fun load() {
     try {
-        noteService.load()
+        if (notesFile.exists()) noteService.load()
+        if (itemsFile.exists()) itemService.load()
+        if (noteItemFile.exists()) noteItemService.load()
     } catch (e: Exception) {
         System.err.println("Error reading from file: $e")
     }
