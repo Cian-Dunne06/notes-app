@@ -8,3 +8,7 @@ Built to practice using Kotlin and Gradle as part of Software Development Tools 
 - Testing using JUnit 5
 - Functions to count and list notes based on a variety of categories
 - Persistence using JSON and XML
+- Items inside of Notes, using a many to many relationship
+- Features to add items and add them to notes
+- Functions to keep reports on items
+  
