@@ -1,25 +1,26 @@
 package service
 
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Assertions.*
 import model.Note
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
-import persistence.XMLSerializer
+import org.junit.jupiter.api.Test
 import persistence.JSONSerializer
+import persistence.XMLSerializer
 import java.io.File
 
-private lateinit var emptyNoteService : NoteService
-private lateinit var populatedNoteService : NoteService
-private lateinit var note1 : Note
-private lateinit var note2 : Note
-private lateinit var note3 : Note
-private lateinit var note4 : Note
-private lateinit var note5 : Note
+private lateinit var emptyNoteService: NoteService
+private lateinit var populatedNoteService: NoteService
+private lateinit var note1: Note
+private lateinit var note2: Note
+private lateinit var note3: Note
+private lateinit var note4: Note
+private lateinit var note5: Note
 
 class NoteServiceTest {
-
     @BeforeEach
     fun setUp() {
         note1 = Note(0, "Test1", "Body1", 1, "Work", false)
@@ -44,7 +45,6 @@ class NoteServiceTest {
         File("test-notes.json").delete()
         println("Test Completed")
     }
-
 
     @Nested
     inner class AddNote {
@@ -109,24 +109,24 @@ class NoteServiceTest {
         }
 
         @Test
-        fun `getActiveNotes returns only non archived notes`(){
+        fun `getActiveNotes returns only non archived notes`() {
             populatedNoteService.archiveNote(note1.id)
             populatedNoteService.archiveNote(note3.id)
 
             val activeList = populatedNoteService.getActiveNotes()
 
             assertEquals(2, activeList.size)
-            assertTrue(activeList.all {!it.isArchived})
+            assertTrue(activeList.all { !it.isArchived })
         }
 
         @Test
-        fun `getActiveNotes returns an empty list when no notes are stored` (){
+        fun `getActiveNotes returns an empty list when no notes are stored`() {
             val activeList = emptyNoteService.getActiveNotes()
             assertTrue(activeList.isEmpty())
         }
 
         @Test
-        fun `getActiveNotes returns empty list when all notes are archived`(){
+        fun `getActiveNotes returns empty list when all notes are archived`() {
             populatedNoteService.archiveNote(note1.id)
             populatedNoteService.archiveNote(note2.id)
             populatedNoteService.archiveNote(note3.id)
@@ -138,21 +138,21 @@ class NoteServiceTest {
         }
 
         @Test
-        fun `getActiveNotes returns all notes when none are archived` () {
+        fun `getActiveNotes returns all notes when none are archived`() {
             val activeList = populatedNoteService.getActiveNotes()
 
             assertEquals(4, activeList.size)
-            assertTrue(activeList.none {it.isArchived})
+            assertTrue(activeList.none { it.isArchived })
         }
 
         @Test
-        fun `getActiveNotes preserves correct count and content` (){
+        fun `getActiveNotes preserves correct count and content`() {
             populatedNoteService.archiveNote(note2.id)
 
             val activeList = populatedNoteService.getActiveNotes()
 
             assertEquals(3, activeList.size)
-            assertTrue(activeList.all {!it.isArchived})
+            assertTrue(activeList.all { !it.isArchived })
 
             assertTrue(activeList.contains(note1))
             assertTrue(activeList.contains(note3))
@@ -179,20 +179,20 @@ class NoteServiceTest {
         }
 
         @Test
-        fun `getNotesByCategory returns no notes when the category is not in the list` () {
+        fun `getNotesByCategory returns no notes when the category is not in the list`() {
             val result = populatedNoteService.getNotesByCategory("Invalid Category")
             assertTrue(result.isEmpty())
         }
 
         @Test
-        fun `getNotesByCategory returns matching categories regardless of case` () {
+        fun `getNotesByCategory returns matching categories regardless of case`() {
             val result = populatedNoteService.getNotesByCategory("home")
             assertEquals(1, result.size)
             assertTrue(result.all { it.category == "Home" })
         }
 
         @Test
-        fun `getNotesByCategory excludes notes whose categories do not match` () {
+        fun `getNotesByCategory excludes notes whose categories do not match`() {
             assertEquals(4, populatedNoteService.numberOfNotes())
 
             val result = populatedNoteService.getNotesByCategory("Work")
@@ -205,24 +205,24 @@ class NoteServiceTest {
         }
 
         @Test
-        fun `getArchivedNotes returns only non active notes`(){
+        fun `getArchivedNotes returns only non active notes`() {
             populatedNoteService.archiveNote(note1.id)
             populatedNoteService.archiveNote(note3.id)
 
             val archivedList = populatedNoteService.getArchivedNotes()
 
             assertEquals(2, archivedList.size)
-            assertTrue(archivedList.all {it.isArchived})
+            assertTrue(archivedList.all { it.isArchived })
         }
 
         @Test
-        fun `getArchivedNotes returns an empty list when no notes are stored` (){
+        fun `getArchivedNotes returns an empty list when no notes are stored`() {
             val archivedList = emptyNoteService.getArchivedNotes()
             assertTrue(archivedList.isEmpty())
         }
 
         @Test
-        fun `getArchivedNotes returns empty list when all notes are active`(){
+        fun `getArchivedNotes returns empty list when all notes are active`() {
             populatedNoteService.activateNote(note1.id)
             populatedNoteService.activateNote(note2.id)
             populatedNoteService.activateNote(note3.id)
@@ -234,7 +234,7 @@ class NoteServiceTest {
         }
 
         @Test
-        fun `getArchivedNotes returns all notes when none are active` () {
+        fun `getArchivedNotes returns all notes when none are active`() {
             populatedNoteService.archiveNote(note1.id)
             populatedNoteService.archiveNote(note2.id)
             populatedNoteService.archiveNote(note3.id)
@@ -242,21 +242,20 @@ class NoteServiceTest {
             val archivedList = populatedNoteService.getArchivedNotes()
 
             assertEquals(4, archivedList.size)
-            assertTrue(archivedList.all {it.isArchived})
+            assertTrue(archivedList.all { it.isArchived })
         }
 
         @Test
-        fun `getArchivedNotes preserves correct count and content` (){
+        fun `getArchivedNotes preserves correct count and content`() {
             populatedNoteService.archiveNote(note1.id)
             populatedNoteService.archiveNote(note2.id)
             populatedNoteService.archiveNote(note3.id)
             populatedNoteService.activateNote(note4.id)
 
-
             val archivedList = populatedNoteService.getArchivedNotes()
 
             assertEquals(3, archivedList.size)
-            assertTrue(archivedList.all {it.isArchived})
+            assertTrue(archivedList.all { it.isArchived })
 
             assertTrue(archivedList.contains(note1))
             assertTrue(archivedList.contains(note2))
@@ -283,13 +282,13 @@ class NoteServiceTest {
         }
 
         @Test
-        fun `getNotesByPriority returns no notes when the priority is not in the list` () {
+        fun `getNotesByPriority returns no notes when the priority is not in the list`() {
             val result = populatedNoteService.getNotesByPriority(6)
             assertTrue(result.isEmpty())
         }
 
         @Test
-        fun `getNotesByPriority excludes notes whose categories do not match` () {
+        fun `getNotesByPriority excludes notes whose categories do not match`() {
             assertEquals(4, populatedNoteService.numberOfNotes())
 
             val result = populatedNoteService.getNotesByPriority(1)
@@ -300,42 +299,40 @@ class NoteServiceTest {
             assertFalse(result.contains(note3))
             assertFalse(result.contains(note4))
         }
-
     }
 
     @Nested
     inner class DeleteNote {
-
         @Test
-        fun `deleting an existing note returns true` () {
+        fun `deleting an existing note returns true`() {
             assertTrue(populatedNoteService.deleteNote(1))
         }
 
         @Test
-        fun `deleting a non-existing note returns false` () {
+        fun `deleting a non-existing note returns false`() {
             assertFalse(populatedNoteService.deleteNote(6))
         }
 
         @Test
-        fun `deleting from an empty service returns false` () {
+        fun `deleting from an empty service returns false`() {
             assertFalse(emptyNoteService.deleteNote(2))
         }
 
         @Test
-        fun `deleting an existing note reduces the number of notes by one` () {
+        fun `deleting an existing note reduces the number of notes by one`() {
             val originalSize = populatedNoteService.getNotes().size
             populatedNoteService.deleteNote(1)
-            assertEquals(originalSize-1, populatedNoteService.getNotes().size)
+            assertEquals(originalSize - 1, populatedNoteService.getNotes().size)
         }
 
         @Test
-        fun `deleting an existing note removes the correct note` () {
+        fun `deleting an existing note removes the correct note`() {
             populatedNoteService.deleteNote(1)
-            assertFalse(populatedNoteService.getNotes().any { it.id == 1})
+            assertFalse(populatedNoteService.getNotes().any { it.id == 1 })
         }
 
         @Test
-        fun `deleting an existing note does not remove an other notes` () {
+        fun `deleting an existing note does not remove an other notes`() {
             populatedNoteService.deleteNote(3)
             assertTrue(populatedNoteService.getNotes().any { it.id == 0 })
             assertTrue(populatedNoteService.getNotes().any { it.id == 1 })
@@ -345,27 +342,26 @@ class NoteServiceTest {
 
     @Nested
     inner class UpdateNote {
-
         @Test
-        fun `updating an existing note returns true` () {
+        fun `updating an existing note returns true`() {
             val updated = Note(1, "Updated Title", "Updated Body", 5, "Work", true)
             assertTrue(populatedNoteService.updateNote(1, updated))
         }
 
         @Test
-        fun `updating a non-existing note returns false` () {
+        fun `updating a non-existing note returns false`() {
             val updated = Note(100, "Updated Title", "Updated Body", 5, "Social", true)
             assertFalse(populatedNoteService.updateNote(100, updated))
         }
 
         @Test
-        fun `updating from an empty service returns false` () {
+        fun `updating from an empty service returns false`() {
             val updated = Note(1, "Updated Title", "Updated Body", 5, "Work", true)
             assertFalse(emptyNoteService.updateNote(1, updated))
         }
 
         @Test
-        fun `updating an existing note changes its stored values` () {
+        fun `updating an existing note changes its stored values`() {
             val updated = Note(1, "Updated Title", "Updated Body", 5, "Social", true)
 
             populatedNoteService.updateNote(1, updated)
@@ -379,7 +375,7 @@ class NoteServiceTest {
         }
 
         @Test
-        fun `updating a note does not change the number of notes` () {
+        fun `updating a note does not change the number of notes`() {
             val originalSize = populatedNoteService.getNotes().size
 
             val updated = Note(1, "Updated Title", "Updated Body", 5, "Social", true)
@@ -389,7 +385,7 @@ class NoteServiceTest {
         }
 
         @Test
-        fun `updating an existing note preserves its id` () {
+        fun `updating an existing note preserves its id`() {
             val updated = Note(33, "Updated Title", "Updated Body", 5, "Home", false)
 
             populatedNoteService.updateNote(1, updated)
@@ -400,9 +396,8 @@ class NoteServiceTest {
 
     @Nested
     inner class CountNotes {
-
         @Test
-        fun `numberOfNotes returns correct value for populated list` () {
+        fun `numberOfNotes returns correct value for populated list`() {
             assertEquals(4, populatedNoteService.numberOfNotes())
         }
 
@@ -464,23 +459,21 @@ class NoteServiceTest {
         fun `numberOfNotesByPriority returns zero when priority does not exist`() {
             assertEquals(0, populatedNoteService.numberOfNotesByPriority(99))
         }
-
     }
 
     @Nested
     inner class PersistenceTests {
-
         @Test
         fun `saving and loading an empty collection in XML doesn't crash app`() {
             // Saving an empty notes.XML file.
             val storingNotes = NoteService(XMLSerializer(File("test-notes.xml")))
             storingNotes.store()
 
-            //Loading the empty notes.xml file into a new object
+            // Loading the empty notes.xml file into a new object
             val loadedNotes = NoteService(XMLSerializer(File("test-notes.xml")))
             loadedNotes.load()
 
-            //Comparing the source of the notes (storingNotes) with the XML-loaded notes (loadedNotes)
+            // Comparing the source of the notes (storingNotes) with the XML-loaded notes (loadedNotes)
             assertEquals(0, storingNotes.numberOfNotes())
             assertEquals(0, loadedNotes.numberOfNotes())
             assertEquals(storingNotes.numberOfNotes(), loadedNotes.numberOfNotes())
@@ -495,11 +488,11 @@ class NoteServiceTest {
             storingNotes.addNote(note3)
             storingNotes.store()
 
-            //Loading notes.xml into a different collection
+            // Loading notes.xml into a different collection
             val loadedNotes = NoteService(XMLSerializer(File("test-notes.xml")))
             loadedNotes.load()
 
-            //Comparing the source of the notes (storingNotes) with the XML-loaded notes (loadedNotes)
+            // Comparing the source of the notes (storingNotes) with the XML-loaded notes (loadedNotes)
             assertEquals(3, storingNotes.numberOfNotes())
             assertEquals(3, loadedNotes.numberOfNotes())
             assertEquals(storingNotes.numberOfNotes(), loadedNotes.numberOfNotes())
@@ -514,11 +507,11 @@ class NoteServiceTest {
             val storingNotes = NoteService(JSONSerializer(File("test-notes.json")))
             storingNotes.store()
 
-            //Loading the empty notes.json file into a new object
+            // Loading the empty notes.json file into a new object
             val loadedNotes = NoteService(JSONSerializer(File("test-notes.json")))
             loadedNotes.load()
 
-            //Comparing the source of the notes (storingNotes) with the XML-loaded notes (loadedNotes)
+            // Comparing the source of the notes (storingNotes) with the XML-loaded notes (loadedNotes)
             assertEquals(0, storingNotes.numberOfNotes())
             assertEquals(0, loadedNotes.numberOfNotes())
             assertEquals(storingNotes.numberOfNotes(), loadedNotes.numberOfNotes())
@@ -533,11 +526,11 @@ class NoteServiceTest {
             storingNotes.addNote(note3)
             storingNotes.store()
 
-            //Loading notes.json into a different collection
+            // Loading notes.json into a different collection
             val loadedNotes = NoteService(JSONSerializer(File("test-notes.json")))
             loadedNotes.load()
 
-            //Comparing the source of the notes (storingNotes) with the JSON loaded notes (loadedNotes)
+            // Comparing the source of the notes (storingNotes) with the JSON loaded notes (loadedNotes)
             assertEquals(3, storingNotes.numberOfNotes())
             assertEquals(3, loadedNotes.numberOfNotes())
             assertEquals(storingNotes.numberOfNotes(), loadedNotes.numberOfNotes())
@@ -564,14 +557,14 @@ class NoteServiceTest {
     @Nested
     inner class ArchiveNotes {
         @Test
-        fun `archiving a note that does not exist returns false`(){
+        fun `archiving a note that does not exist returns false`() {
             assertFalse(populatedNoteService.archiveNote(6))
             assertFalse(populatedNoteService.archiveNote(-1))
             assertFalse(emptyNoteService.archiveNote(0))
         }
 
         @Test
-        fun `archiving an already archived note returns false`(){
+        fun `archiving an already archived note returns false`() {
             populatedNoteService.findNoteById(2)!!.isArchived = true
             assertTrue(populatedNoteService.findNoteById(2)!!.isArchived)
             assertFalse(populatedNoteService.archiveNote(2))
@@ -586,8 +579,7 @@ class NoteServiceTest {
     }
 
     @Nested
-    inner class CountingNotes{
-
+    inner class CountingNotes {
         @Test
         fun `numberOfNotes returns correct total count for populated service`() {
             assertEquals(4, populatedNoteService.numberOfNotes())
@@ -691,12 +683,9 @@ class NoteServiceTest {
         }
 
         @Test
-        fun `searchNotesByContent returns matching notes when content is only partial` () {
+        fun `searchNotesByContent returns matching notes when content is only partial`() {
             val result = populatedNoteService.searchNotesByContent("tes")
             assertEquals(4, result.size)
         }
     }
-
-
-
 }

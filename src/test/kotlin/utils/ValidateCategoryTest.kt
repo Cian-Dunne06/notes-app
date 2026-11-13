@@ -1,12 +1,13 @@
 package utils
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class ValidateCategoryTest {
-
     @Test
-    fun `Categories Return Full Categories Set` () {
+    fun `Categories Return Full Categories Set`() {
         assertEquals(categories, setOf("Home", "Work", "College", "Social"))
     }
 

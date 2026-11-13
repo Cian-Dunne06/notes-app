@@ -3,9 +3,9 @@ package service
 import model.Item
 import persistence.Serializer
 
-
-class ItemService(serializeType: Serializer) {
-
+class ItemService(
+    serializeType: Serializer,
+) {
     private var serializer: Serializer = serializeType
 
     private var items = ArrayList<Item>()
@@ -14,22 +14,17 @@ class ItemService(serializeType: Serializer) {
         items.add(item)
     }
 
-    fun getItem(): List<Item> {
-        return items
-    }
+    fun getItem(): List<Item> = items
 
-    fun findItemById(id: Int): Item? {
-        return items.find { it.id == id }
-    }
+    fun findItemById(id: Int): Item? = items.find { it.id == id }
 
-    fun searchItemsByContent(content: String): List<Item> = items.filter{ item -> (item.description.contains(content, ignoreCase = true))}
+    fun searchItemsByContent(content: String): List<Item> = items.filter { item -> (item.description.contains(content, ignoreCase = true)) }
 
     fun numberOfItems() = items.size
 
     fun numberOfCompleteItems() = items.filter { it.isCompleted }.size
 
     fun numberOfIncompleteItems() = items.filter { !it.isCompleted }.size
-
 
     fun load() {
         val array = serializer.read(Array<Item>::class.java)
@@ -40,4 +35,3 @@ class ItemService(serializeType: Serializer) {
         serializer.write(items)
     }
 }
-

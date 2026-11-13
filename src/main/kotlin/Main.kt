@@ -1,14 +1,13 @@
 import io.github.oshai.kotlinlogging.KotlinLogging
-import service.NoteService
-import model.Note
 import model.Item
+import model.Note
 import persistence.JSONSerializer
 import service.ItemService
 import service.NoteItemService
+import service.NoteService
 import utils.categories
 import utils.isValidCategory
 import utils.isValidStatus
-//import persistence.XMLSerializer
 import utils.readNextBoolean
 import utils.readNextInt
 import utils.readNextLine
@@ -19,7 +18,8 @@ import java.io.File
 private val logger = KotlinLogging.logger {}
 
 val notesFile = File("notes.json")
-//val noteService = NoteService(XMLSerializer(File("notes.xml")))
+
+// val noteService = NoteService(XMLSerializer(File("notes.xml")))
 val noteService = NoteService(JSONSerializer(notesFile))
 
 val itemsFile = File("items.json")
@@ -27,7 +27,6 @@ val itemService = ItemService(JSONSerializer(itemsFile))
 
 val noteItemFile = File("itemNotes.json")
 val noteItemService = NoteItemService(JSONSerializer(noteItemFile))
-
 
 fun main() {
     logger.info { "Notes App Started" }
@@ -37,7 +36,8 @@ fun main() {
 }
 
 fun mainMenu(): Int {
-    print("""
+    print(
+        """
         >------------------------------
         >|      Note Keeper App       |  
         >------------------------------
@@ -57,35 +57,78 @@ fun mainMenu(): Int {
         >------------------------------
         >|  0) Exit                   |
         >------------------------------
-        > """.trimMargin(">"))
+        > """.trimMargin(">"),
+    )
     return readNextInt("==>> ")
 }
 
 fun runMenu() {
-    var input : Int
+    var input: Int
     do {
         input = mainMenu()
         when (input) {
-            1 -> addNote()
-            2 -> runListMenu()
-            3 -> updateNote()
-            4 -> deleteNote()
-            5 -> archiveNote()
-            6 -> activateNote()
-            7 -> searchByContent()
-            8 -> addItemToNote()
-            9 -> viewItemsForNote()
-            20 -> save()
-            21 -> load()
-            30 -> runItemMenu()
-            0 -> { save(); println("Exiting App") }
-            else -> println("Invalid Option")
+            1 -> {
+                addNote()
+            }
+
+            2 -> {
+                runListMenu()
+            }
+
+            3 -> {
+                updateNote()
+            }
+
+            4 -> {
+                deleteNote()
+            }
+
+            5 -> {
+                archiveNote()
+            }
+
+            6 -> {
+                activateNote()
+            }
+
+            7 -> {
+                searchByContent()
+            }
+
+            8 -> {
+                addItemToNote()
+            }
+
+            9 -> {
+                viewItemsForNote()
+            }
+
+            20 -> {
+                save()
+            }
+
+            21 -> {
+                load()
+            }
+
+            30 -> {
+                runItemMenu()
+            }
+
+            0 -> {
+                save()
+                println("Exiting App")
+            }
+
+            else -> {
+                println("Invalid Option")
+            }
         }
     } while (input != 0)
 }
 
-fun addNote(){
-    val title =  readNextLine("Title: ")
+fun addNote() {
+    val title = readNextLine("Title: ")
 
     val body = readNextLine("Body: ")
 
@@ -114,7 +157,7 @@ fun addNote(){
     } while (!isValidStatus(status))
 
     noteService.addNote(
-        Note(0, title, body, priority, category, false, status)
+        Note(0, title, body, priority, category, false, status),
     )
 
     println("Note added")
@@ -126,7 +169,7 @@ fun listNotes() {
         println("No notes stored")
     } else {
         listNotes.forEach { println(it) }
-       println("There are ${noteService.numberOfNotes()} notes")
+        println("There are ${noteService.numberOfNotes()} notes")
     }
 }
 
@@ -171,8 +214,9 @@ fun listNotesByPriority() {
     }
 }
 
-fun listNoteMenu (): Int {
-    print("""
+fun listNoteMenu(): Int {
+    print(
+        """
         >------------------------------
         >|      List Notes            |  
         >------------------------------
@@ -185,7 +229,8 @@ fun listNoteMenu (): Int {
         >------------------------------
         >|  0) Go Back                |
         >------------------------------
-    """.trimMargin(">"))
+    """.trimMargin(">"),
+    )
     return readNextInt("==>> ")
 }
 
@@ -195,11 +240,18 @@ fun runListMenu() {
         input = listNoteMenu()
         when (input) {
             1 -> listNotes()
+
             2 -> listArchivedNotes()
+
             3 -> listActiveNotes()
+
             4 -> listNotesByCategory()
+
             5 -> listNotesByPriority()
-            0 -> println("Returning to Main Menu...") // Option 0 breaks the loop and returns naturally
+
+            0 -> println("Returning to Main Menu...")
+
+            // Option 0 breaks the loop and returns naturally
             else -> println("Invalid Option")
         }
     } while (input != 0)
@@ -240,7 +292,7 @@ fun updateNote() {
 }
 
 fun archiveNote() {
-    noteService.getNotes().forEach {if (!it.isArchived) println(it)}
+    noteService.getNotes().forEach { if (!it.isArchived) println(it) }
 
     val id = readNextInt("ID to be archived: ")
 
@@ -252,7 +304,7 @@ fun archiveNote() {
 }
 
 fun activateNote() {
-    noteService.getNotes().forEach {if (it.isArchived) println(it)}
+    noteService.getNotes().forEach { if (it.isArchived) println(it) }
 
     val id = readNextInt("ID to be activated: ")
 
@@ -273,10 +325,11 @@ fun searchByContent() {
     }
 }
 
-//--------------------------ITEMS---------------------------------------------------------------------
+// --------------------------ITEMS---------------------------------------------------------------------
 
 fun listItemMenu(): Int {
-    print("""
+    print(
+        """
         >------------------------------
         >|         Item Menu          |  
         >------------------------------
@@ -288,12 +341,13 @@ fun listItemMenu(): Int {
         >------------------------------
         >|  0) Back                   |
         >------------------------------
-        > """.trimMargin(">"))
+        > """.trimMargin(">"),
+    )
     return readNextInt("==>> ")
 }
 
 fun runItemMenu() {
-    var input : Int
+    var input: Int
     do {
         input = listItemMenu()
         when (input) {
@@ -306,6 +360,7 @@ fun runItemMenu() {
         }
     } while (input != 0)
 }
+
 fun searchItemByContent() {
     val content = readNextLine("Enter content to search: ")
     val results = itemService.searchItemsByContent(content)
@@ -324,13 +379,13 @@ fun addItem() {
     val complete = readNextBoolean("Complete(True/False): ")
 
     itemService.addItem(
-        Item(id, description, complete)
+        Item(id, description, complete),
     )
 
     println("Item added")
 }
 
-fun listItems(){
+fun listItems() {
     val listItems = itemService.getItem()
     if (listItems.isEmpty()) {
         println("No items stored")
@@ -341,7 +396,8 @@ fun listItems(){
 }
 
 fun itemReport() {
-    print("""
+    print(
+        """
         >------------------------------
         >       Item Report 
         >------------------------------
@@ -349,9 +405,9 @@ fun itemReport() {
         >  Complete Items: ${itemService.numberOfCompleteItems()}           
         >  Incomplete Items: ${itemService.numberOfIncompleteItems()}           
         >------------------------------
-        > """.trimMargin(">"))
+        > """.trimMargin(">"),
+    )
 }
-
 
 fun addItemToNote() {
     listNotes()
@@ -366,8 +422,11 @@ fun addItemToNote() {
         println("Item not found")
         return
     }
-    if (noteItemService.addItemToNote(noteId, itemId)) println("Item added to note")
-    else println("That item is already on this note")
+    if (noteItemService.addItemToNote(noteId, itemId)) {
+        println("Item added to note")
+    } else {
+        println("That item is already on this note")
+    }
 }
 
 fun viewItemsForNote() {
@@ -389,9 +448,10 @@ fun viewItemsForNote() {
     itemIds.forEach { itemId ->
         val item = itemService.findItemById(itemId)
         if (item != null) println(item)
-        }
+    }
 }
-//--------------------------------------------------------------------
+
+// --------------------------------------------------------------------
 fun save() {
     try {
         noteService.store()
@@ -411,4 +471,3 @@ fun load() {
         System.err.println("Error reading from file: $e")
     }
 }
-
